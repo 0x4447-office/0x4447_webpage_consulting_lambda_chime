@@ -1,7 +1,17 @@
 let AWS = require("aws-sdk");
+let { v4: uuidv4 } = require('uuid');
 
 //
-//	LAMBDA_DESCRIPTION
+//	Initialize Amazon Chime.
+//
+let chime = new AWS.Chime({
+	apiVersion: '2018-05-01',
+	region: process.env.AWS_REGION || 'us-east-1'
+});
+
+//
+//	This lambda will create a Chime event, and send out the emails
+//	with all the details.
 //
 exports.handler = (event) => {
 
@@ -23,7 +33,7 @@ exports.handler = (event) => {
 		//
 		//	->	Start the chain.
 		//
-		step_one(container)
+		create_a_meeting(container)
 			.then(function(container) {
 
 				return step_two(container);
@@ -57,16 +67,41 @@ exports.handler = (event) => {
 //
 //
 //
-function step_one(container)
+function create_a_meeting(container)
 {
 	return new Promise(function(resolve, reject) {
 
-        console.info("step_one");
+        console.info("create_a_meeting");
 
-        //
-        //	->	Move to the next promise.
-        //
-        return resolve(container);
+		//
+		//	1.	Prepare the query.
+		//
+		let params = {
+			ClientRequestToken: uuidv4()
+		};
+
+		//
+		//	-->	Execute the query.
+		//
+		chime.createMeeting(params, function(error, data) {
+
+			//
+			//	1.	Check for internal errors.
+			//
+			if(error)
+			{
+				console.info(params);
+				return reject(error);
+			}
+
+			console.log(JOSN.stringify(data, null, 4))
+
+			//
+			//	--> move to the next step.
+			//
+			return resolve(error);
+
+		});
 
 	});
 }
@@ -74,16 +109,52 @@ function step_one(container)
 //
 //
 //
-function step_two(container)
+function write_message(container)
 {
 	return new Promise(function(resolve, reject) {
 
-		console.info("step_two");
+		console.info("write_message");
+		
+		//
+		//	1.	Convert the S3 payload in to a string and jsut use it as it is
+		//		since we don't need anything fancy for ourselfs.
+		//
+		let user_details = JSON.stringify(container.user_details, null, 4);
+		
+		//
+		//	2.	Prepare the data to be replaced.
+		//
+		let data = {
+			user_details: user_details
+		}
 
 		//
-        //	->	Move to the next promise.
-        //
-        return resolve(container);
+		//	3.	Render the message.
+		//
+		let message = mustache.render(container.templates.organizer.text, data);
 
+		//
+		//	4.	Save it for the next promise.
+		//
+		container.message.organizer = {
+			subject: container.templates.organizer.subject,
+			body: message,
+			emails: {
+				to: {
+					name: "David To",
+					email: "null+to@0x4447.email"
+				},
+				cc: {
+					name: "David CC",
+					email: "null+cc@0x4447.email"
+				}
+			}
+		}
+
+		//
+		//	->	Move to the next promise.
+		//
+		return resolve(container);
+		
 	});
 }
