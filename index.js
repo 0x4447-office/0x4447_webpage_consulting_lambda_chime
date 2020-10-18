@@ -1,13 +1,18 @@
 let AWS = require("aws-sdk");
-let { v4: uuidv4 } = require('uuid');
+let ical = require('ical-generator');
+let mustache = require('mustache');
 
 //
-//	Initialize Amazon Chime.
+//	Bringing S3 to life.
 //
-let chime = new AWS.Chime({
-	apiVersion: '2018-05-01',
-	region: process.env.AWS_REGION || 'us-east-1'
+let s3 = new AWS.S3({
+	apiVersion: '2006-03-01'
 });
+
+//
+//	Load all the email templates.
+//
+let templates = require('./assets/templates/index');
 
 //
 //	This lambda will create a Chime event, and send out the emails
@@ -17,11 +22,21 @@ exports.handler = (event) => {
 
 	return new Promise(function(resolve, reject) {
 
+        console.log(event)
+
 		//
 		//	1. This container holds all the data to be passed around the chain.
 		//
 		let container = {
-			req: {},
+			req: {
+                emails: [],
+                agenda: "",
+                first_name: "Bob",
+                start_time: "2020-10-05T00:00:00Z",
+                end_time: "2020-10-05T01:00:00Z"
+            },
+            templates: templates,
+            message: null,
 			//
 			//	The default response for Lambda.
 			//
@@ -33,10 +48,14 @@ exports.handler = (event) => {
 		//
 		//	->	Start the chain.
 		//
-		create_a_meeting(container)
+		build_out_the_ical_file(container)
 			.then(function(container) {
 
-				return step_two(container);
+				return write_message(container);
+
+			}).then(function(container) {
+
+				return send_email(container);
 
 			}).then(function(container) {
 
@@ -67,41 +86,82 @@ exports.handler = (event) => {
 //
 //
 //
-function create_a_meeting(container)
+function build_out_the_ical_file(container)
 {
 	return new Promise(function(resolve, reject) {
 
-        console.info("create_a_meeting");
+		console.info("build_out_the_ical_file");
 
 		//
-		//	1.	Prepare the query.
+		//	1.	Initialize iCal
 		//
-		let params = {
-			ClientRequestToken: uuidv4()
-		};
-
-		//
-		//	-->	Execute the query.
-		//
-		chime.createMeeting(params, function(error, data) {
-
-			//
-			//	1.	Check for internal errors.
-			//
-			if(error)
-			{
-				console.info(params);
-				return reject(error);
-			}
-
-			console.log(JOSN.stringify(data, null, 4))
-
-			//
-			//	--> move to the next step.
-			//
-			return resolve(error);
+		let cal = ical({
+			domain: '0x4447.com',
+			prodId: {
+				company: '0x4447.com',
+				product: 'meeting'
+			},
+			name: "0x4447",
+			timezone: 'Europe/Berlin',
 
 		});
+
+		//
+		//	2.	Set some basic info about the file.
+		//
+		cal.prodId({
+			company: '0x4447',
+			product: 'meeting',
+			language: 'EN'
+        });
+
+        //
+		//	3.	Create the description of the iCal file.
+		//
+		let description = container.templates.calendar.text;
+
+		//
+		//	4.	Set the bulk of the event with all the data.
+		//
+		let event = cal.createEvent({
+			start: container.req.start_time,
+			end: container.req.end_time,
+			summary: container.req.first_name + " & David",
+			description: description,
+			organizer: 'David Gatti <david@0x4447.com>'
+		});
+
+		//
+		//	6.	Add all the atendees of the meeting.
+		//
+		event.createAttendee({ email: 'meet@chime.aws', name: 'Chime' });
+		event.createAttendee({ email: 'pin+3581170376@chime.aws', name: 'PIN' });
+
+        // event.createAttendee({
+		// 	email: container.user_details.email,
+		// 	name: container.user_details.full_name,
+		// 	rsvp: true
+		// });
+
+		//
+		//	7.	Set when the callendar app should notificy about the event.
+		//
+		event.createAlarm({
+			type: 'audio',
+			trigger: 300 * 6, // 30min before event
+		});
+
+		//
+		//	8.	Convert the file in to a Base64 so we can attach it to the
+		//		email message payload.
+		//
+		container.ics = Buffer.from(cal.toString()).toString('base64');
+
+		//
+		//	->	Move to the next promise.
+		//
+		return resolve(container);
+
 
 	});
 }
@@ -114,47 +174,73 @@ function write_message(container)
 	return new Promise(function(resolve, reject) {
 
 		console.info("write_message");
-		
-		//
-		//	1.	Convert the S3 payload in to a string and jsut use it as it is
-		//		since we don't need anything fancy for ourselfs.
-		//
-		let user_details = JSON.stringify(container.user_details, null, 4);
-		
-		//
-		//	2.	Prepare the data to be replaced.
-		//
-		let data = {
-			user_details: user_details
-		}
 
-		//
-		//	3.	Render the message.
-		//
-		let message = mustache.render(container.templates.organizer.text, data);
+        console.log(container.ics)
 
 		//
 		//	4.	Save it for the next promise.
 		//
-		container.message.organizer = {
-			subject: container.templates.organizer.subject,
-			body: message,
+		container.message = {
+			subject: container.templates.calendar.subject,
+			body: "See atachement.",
 			emails: {
 				to: {
-					name: "David To",
-					email: "null+to@0x4447.email"
-				},
-				cc: {
-					name: "David CC",
-					email: "null+cc@0x4447.email"
+					name: "David Gatti",
+					email: "david@0x4447.com"
 				}
-			}
+			},
+			attachments: [
+				{
+					filename: 'event.ics',
+					content: container.ics.toString('base64'),
+					encoding: 'base64'
+				}
+			]
 		}
 
 		//
 		//	->	Move to the next promise.
 		//
 		return resolve(container);
-		
+
+	});
+}
+
+function send_email(container)
+{
+	return new Promise(function(resolve, reject) {
+
+		console.info("send_email");
+
+		//
+		//	1.	Prepare the query.
+		//
+		let params = {
+			Bucket: '0x4447-web-us-east-1-smtp',
+			Key: Date.now() + '.json',
+			Body: JSON.stringify(container.message)
+		};
+
+		//
+		//	-> Execute the query.
+		//
+		s3.putObject(params, function (error, data) {
+
+			//
+			//	1.	Check for internal errors.
+			//
+			if(error)
+			{
+				console.info(params);
+				return reject(error);
+			}
+
+			//
+			//	->	Move to the next promise.
+			//
+			return resolve(container);
+
+		});
+
 	});
 }
