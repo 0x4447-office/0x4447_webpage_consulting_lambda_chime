@@ -22,7 +22,7 @@ exports.handler = (event) => {
 
 	return new Promise(function(resolve, reject) {
 
-        console.log(event)
+        console.log(JSON.stringify(event, null, 4))
 
 		//
 		//	1. This container holds all the data to be passed around the chain.
@@ -41,7 +41,7 @@ exports.handler = (event) => {
 			//	The default response for Lambda.
 			//
 			res: {
-                message: "OK"
+                statusCode: 200
             }
 		}
 
