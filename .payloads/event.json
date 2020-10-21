@@ -1,1 +1,99 @@
-{}
+{
+    "version": "1.0",
+    "resource": "/",
+    "path": "/",
+    "httpMethod": "POST",
+    "headers": {
+        "Content-Length": "1909",
+        "Content-Type": "application/json",
+        "Host": "yty2nb9yle.execute-api.us-east-1.amazonaws.com",
+        "User-Agent": "Calendly",
+        "X-Amzn-Trace-Id": "Root=1-5f8fe9dc-36ae5737333411951af86f2f",
+        "X-Calendly-Hook-Id": "872856",
+        "X-Forwarded-For": "54.227.191.252",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https",
+        "X-Newrelic-Id": "VwUDWFRaGwECU1dbDgY=",
+        "X-Newrelic-Transaction": "PxQEA1BbClUGAFdQDwRUUwBVFB8EBw8RVU4aUVoODABVU11XA1kGAVFSU0NKQVwAAQUAUQcFFTs=",
+        "accept": "*/*",
+        "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3"
+    },
+    "multiValueHeaders": {
+        "Content-Length": [
+            "1909"
+        ],
+        "Content-Type": [
+            "application/json"
+        ],
+        "Host": [
+            "yty2nb9yle.execute-api.us-east-1.amazonaws.com"
+        ],
+        "User-Agent": [
+            "Calendly"
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-5f8fe9dc-36ae5737333411951af86f2f"
+        ],
+        "X-Calendly-Hook-Id": [
+            "872856"
+        ],
+        "X-Forwarded-For": [
+            "54.227.191.252"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ],
+        "X-Newrelic-Id": [
+            "VwUDWFRaGwECU1dbDgY="
+        ],
+        "X-Newrelic-Transaction": [
+            "PxQEA1BbClUGAFdQDwRUUwBVFB8EBw8RVU4aUVoODABVU11XA1kGAVFSU0NKQVwAAQUAUQcFFTs="
+        ],
+        "accept": [
+            "*/*"
+        ],
+        "accept-encoding": [
+            "gzip;q=1.0,deflate;q=0.6,identity;q=0.3"
+        ]
+    },
+    "queryStringParameters": null,
+    "multiValueQueryStringParameters": null,
+    "requestContext": {
+        "accountId": "297884123568",
+        "apiId": "yty2nb9yle",
+        "domainName": "yty2nb9yle.execute-api.us-east-1.amazonaws.com",
+        "domainPrefix": "yty2nb9yle",
+        "extendedRequestId": "UwF6fhj5IAMEVdg=",
+        "httpMethod": "POST",
+        "identity": {
+            "accessKey": null,
+            "accountId": null,
+            "caller": null,
+            "cognitoAmr": null,
+            "cognitoAuthenticationProvider": null,
+            "cognitoAuthenticationType": null,
+            "cognitoIdentityId": null,
+            "cognitoIdentityPoolId": null,
+            "principalOrgId": null,
+            "sourceIp": "54.227.191.252",
+            "user": null,
+            "userAgent": "Calendly",
+            "userArn": null
+        },
+        "path": "/",
+        "protocol": "HTTP/1.1",
+        "requestId": "UwF6fhj5IAMEVdg=",
+        "requestTime": "21/Oct/2020:07:57:16 +0000",
+        "requestTimeEpoch": 1603267036685,
+        "resourceId": "POST /",
+        "resourcePath": "/",
+        "stage": "$default"
+    },
+    "pathParameters": null,
+    "stageVariables": null,
+    "body": "{\"event\":\"invitee.created\",\"payload\":{\"event_type\":{\"uuid\":\"GBFK5EHE4BVGXALU\",\"kind\":\"One-on-One\",\"slug\":\"schedule\",\"name\":\"schedule\",\"duration\":60,\"owner\":{\"type\":\"users\",\"uuid\":\"DAEDLB2ZUOPW4CBU\"}},\"event\":{\"uuid\":\"EBVOFWZCAS5OW7NC\",\"assigned_to\":[\"David Gatti\"],\"extended_assigned_to\":[{\"name\":\"David Gatti\",\"email\":\"david@0x4447.com\",\"primary\":true}],\"start_time\":\"2020-10-31T15:00:00+01:00\",\"start_time_pretty\":\"03:00pm - Saturday, October 31, 2020\",\"invitee_start_time\":\"2020-10-31T15:00:00+01:00\",\"invitee_start_time_pretty\":\"03:00pm - Saturday, October 31, 2020\",\"end_time\":\"2020-10-31T16:00:00+01:00\",\"end_time_pretty\":\"04:00pm - Saturday, October 31, 2020\",\"invitee_end_time\":\"2020-10-31T16:00:00+01:00\",\"invitee_end_time_pretty\":\"04:00pm - Saturday, October 31, 2020\",\"created_at\":\"2020-10-21T09:57:15+02:00\",\"location\":\"Amazon Chime\",\"canceled\":false,\"canceler_name\":null,\"cancel_reason\":null,\"canceled_at\":null},\"invitee\":{\"uuid\":\"HBTUOELIVOPXSLXQ\",\"first_name\":\"Dawid\",\"last_name\":\"Gatti\",\"name\":\"Dawid Gatti\",\"email\":\"david@example.com\",\"text_reminder_number\":null,\"timezone\":\"Europe/Berlin\",\"created_at\":\"2020-10-21T09:57:15+02:00\",\"is_reschedule\":false,\"payments\":[],\"canceled\":false,\"canceler_name\":null,\"cancel_reason\":null,\"canceled_at\":null},\"questions_and_answers\":[{\"question\":\"Company\",\"answer\":\"0x4447, LLC\"},{\"question\":\"Job Title\",\"answer\":\"654\"},{\"question\":\"Company URL\",\"answer\":\"456\"},{\"question\":\"Meeting agenda\",\"answer\":\"456\"}],\"questions_and_responses\":{\"1_question\":\"Company\",\"1_response\":\"0x4447, LLC\",\"2_question\":\"Job Title\",\"2_response\":\"654\",\"3_question\":\"Company URL\",\"3_response\":\"456\",\"4_question\":\"Meeting agenda\",\"4_response\":\"456\"},\"tracking\":{\"utm_campaign\":null,\"utm_source\":null,\"utm_medium\":null,\"utm_content\":null,\"utm_term\":null,\"salesforce_uuid\":null},\"old_event\":null,\"old_invitee\":null,\"new_event\":null,\"new_invitee\":null},\"time\":\"2020-10-21T07:57:16Z\"}",
+    "isBase64Encoded": false
+}
