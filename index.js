@@ -144,7 +144,15 @@ function build_out_the_ical_file(container)
         });
 
         //
-        //	8.	Set when the callendar app should notificy about the event.
+        //  8. Set the organzier.
+        //
+        event.organizer({
+            name: 'David Gatti',
+            email: 'david@0x4447.com'
+        })
+
+        //
+        //	9.	Set when the callendar app should notificy about the event.
         //
         event.createAlarm({
             type: 'audio',
@@ -152,7 +160,7 @@ function build_out_the_ical_file(container)
         });
 
         //
-        //	9.	Convert the file in to a Base64 so we can attach it to the
+        //	10.	Convert the file in to a Base64 so we can attach it to the
         //		email message payload.
         //
         container.ics = Buffer.from(cal.toString()).toString('base64');
