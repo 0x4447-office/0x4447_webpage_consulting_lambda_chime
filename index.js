@@ -133,7 +133,7 @@ function build_out_the_ical_file(container)
         //	6.	Add all the atendees of the meeting.
         //
         event.createAttendee({ email: 'meet@chime.aws', name: 'Chime' });
-        event.createAttendee({ email: 'pin+0000001@chime.aws', name: 'PIN' });
+        event.createAttendee({ email: 'pin+3581170376@chime.aws', name: 'PIN' });
 
         //
         //  7. Add details about the invitee.
